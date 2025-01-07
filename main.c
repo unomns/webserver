@@ -32,7 +32,7 @@ int main(int argc, const char * argv[]) {
             continue;
         }
         
-        printf("Incoming connection\n");
+        printf("Client connected\n");
         if (!fork())
             cli_conn(srv_d, cli_d);
     }
