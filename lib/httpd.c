@@ -112,7 +112,7 @@ void http_response(int cli_fd, char *content_type, char *data) {
 	memset(buf, 0, BUFFERSIZE);
     snprintf(buf, BUFFERSIZE - 1,
              "Content-Type: %s\n"
-             "Content-Length: %d"
+             "Content-Length: %d\n"
              "\n%s\n",
              content_type, n, data);
     
@@ -127,21 +127,16 @@ void http_headers(int cli_fd, int code) {
 	memset(buf, 0, BUFFERSIZE);	
 	snprintf(buf, BUFFERSIZE - 1,
 			"HTTP/1.0 %d OK\n"
-			"Server: httpd.c\n"
+			"Server: lib/httpd.c\n"
 			"Cache-Control: no-store, no-cache, max-age=0, private\n"
 			"Content-Language: en\n"
 			"Enpries: -1\n"
 			"X-Frame-Options: SAMEORIGIN\n",
-			code
-	);
+			code);
 
 	n = (int)strlen(buf);
 	write(cli_fd, buf, n);
 }
-
-/*
-			"Content-Type: %s\n"
-*/
 
 void cli_conn(int srv_fd, int cli_fd) {
     HttpReq *req;
@@ -162,16 +157,17 @@ void cli_conn(int srv_fd, int cli_fd) {
         return;
     }
 
-		if (!strcmp(req->method, "GET") || !strcmp(req->url, "/api/home_page")) {
-			res = "<html>Hello World</html>";
-			http_headers(cli_fd, 200);
-			http_response(cli_fd, "text/html", res);
-		}
-		else {
-            res = "File not found";
-            http_headers(cli_fd, 404);
-			http_response(cli_fd, "text/plain", res);
-		}
+    if (!strcmp(req->method, "GET") 
+        && !strcmp(req->url, "/api/home_page")
+    ) {
+        res = "<html>Hello World</html>";
+        http_headers(cli_fd, 200);
+        http_response(cli_fd, "text/html", res);
+    } else {
+        res = "File not found";
+        http_headers(cli_fd, 404);
+        http_response(cli_fd, "text/plain", res);
+    }
     
     free(req);
     close(cli_fd);
