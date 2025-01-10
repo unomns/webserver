@@ -1,2 +1,3 @@
 *.swp
-httpd*
+server
+server.*
